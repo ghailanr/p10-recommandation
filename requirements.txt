@@ -4,9 +4,9 @@
 
 azure-functions
 azure-storage-blob
-//streamlit
-//pandas
 numpy
-requests
-//scikit-learn
-//implicit
+#requests
+#streamlit
+#pandas
+#scikit-learn
+#implicit
