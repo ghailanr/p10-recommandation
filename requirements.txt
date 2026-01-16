@@ -3,9 +3,10 @@
 # azure-monitor-opentelemetry
 
 azure-functions
-streamlit
-pandas
+azure-storage-blob
+//streamlit
+//pandas
 numpy
 requests
-scikit-learn
-implicit
+//scikit-learn
+//implicit
