@@ -5,7 +5,7 @@
 azure-functions
 azure-storage-blob
 faiss-cpu
-#numpy
+numpy==1.26.0
 logging
 #requests
 #streamlit
