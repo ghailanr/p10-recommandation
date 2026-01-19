@@ -1,51 +1,81 @@
 import logging
+import json
 import azure.functions as func
-import os
 import pickle
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+import faiss
+import time
+import os
 from azure.storage.blob import BlobServiceClient
 
-# -----------------------
-# Chargement au cold start
-# -----------------------
+EMBEDDINGS = None
+NEIGHBORS = None
+INITIALIZED = False
+TOP_K = 20
 
-EMBEDDINGS_CONTAINER = os.getenv("ocp10", "embeddings")
-EMBEDDINGS_BLOB_PATH = "embeddings/embeddings_pca.pkl"
+def load_embeddings():
+    global EMBEDDINGS
+    if EMBEDDINGS is not None:
+        return
 
-embeddings = None
-
-try:
-    logging.info("Initializing BlobServiceClient...")
-    
-    blob_service_client = BlobServiceClient.from_connection_string(
-        os.environ["AzureWebJobsStorage"]
+    logging.info("Loading embeddings from Blob Storage...")
+    conn = os.environ["ocp10_STORAGE"]
+    blob_service = BlobServiceClient.from_connection_string(conn)
+    blob = blob_service.get_blob_client(
+        container="embeddings",
+        blob="embeddings_pca.pkl"
     )
 
-    container_client = blob_service_client.get_container_client(
-        EMBEDDINGS_CONTAINER
-    )
+    EMBEDDINGS = pickle.loads(blob.download_blob().readall())
+    logging.info("Embeddings loaded.")
 
-    blob_client = container_client.get_blob_client(EMBEDDINGS_BLOB_PATH)
+def initialize_index():
+    global INITIALIZED, NEIGHBORS
 
-    logging.info("Downloading embeddings from Blob Storage...")
-    blob_data = blob_client.download_blob().readall()
+    logging.info("Cold start: initializing recommender...")
 
-    embeddings = pickle.loads(blob_data)
+    # Normalize
+    faiss.normalize_L2(EMBEDDINGS)
 
-    logging.info(
-        f"Embeddings loaded successfully. "
-        f"Type={type(embeddings)}, "
-        f"Size={len(embeddings) if hasattr(embeddings, '__len__') else 'N/A'}"
-    )
+    d = EMBEDDINGS.shape[1]
+    index = faiss.IndexFlatIP(d)
+    index.add(EMBEDDINGS)
 
-except Exception as e:
-    logging.error("Failed to load embeddings at startup", exc_info=e)
-    embeddings = None
+    # Compute neighbors
+    _, I = index.search(EMBEDDINGS, TOP_K + 1)
 
+    # Remove self
+    NEIGHBORS = {
+        i: I[i][1:].tolist()
+        for i in range(len(I))
+    }
 
-# -----------------------
-# HTTP Trigger
-# -----------------------
+    INITIALIZED = True
+    logging.info("Initialization complete")
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    return func.HttpResponse("Hello World", status_code=200)
+    start_time = time.time()
+    global INITIALIZED
+
+    if not INITIALIZED:
+        load_embeddings()
+        initialize_index()
+        logging.info(f"Initialization time: {time.time() - start_time:.2f} seconds")
+
+    article_id = int(req.params.get("article_id", -1))
+
+    if article_id < 0 or article_id not in NEIGHBORS:
+        return func.HttpResponse("Invalid article_id", status_code=400)
+
+    formulating_answer_start = time.time()
+    response = func.HttpResponse(
+        json.dumps({
+            "article_id": article_id,
+            "recommendations": NEIGHBORS[article_id][:5]
+        }),
+        mimetype="application/json"
+    )
+    logging.info(f"Answer formulation time: {time.time() - formulating_answer_start:.2f} seconds")
+    return response
 

@@ -5,6 +5,7 @@
 azure-functions
 azure-storage-blob
 numpy
+logging
 #requests
 #streamlit
 #pandas
