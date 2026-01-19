@@ -4,6 +4,7 @@
 
 azure-functions
 azure-storage-blob
+faiss-cpu
 #numpy
 logging
 #requests
