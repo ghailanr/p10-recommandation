@@ -2,8 +2,7 @@ import logging
 import json
 import azure.functions as func
 import pickle
-import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
+#import numpy as np
 import faiss
 import time
 import os
@@ -20,7 +19,8 @@ def load_embeddings():
         return
 
     logging.info("Loading embeddings from Blob Storage...")
-    conn = os.environ["ocp10_STORAGE"]
+    #conn = os.environ["ocp10_STORAGE"] //Local Execution only
+    conn = os.getenv("AzureWebJobsStorage")
     blob_service = BlobServiceClient.from_connection_string(conn)
     blob = blob_service.get_blob_client(
         container="embeddings",

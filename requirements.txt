@@ -4,10 +4,10 @@
 
 azure-functions
 azure-storage-blob
-numpy
+#numpy
 logging
 #requests
 #streamlit
 #pandas
-#scikit-learn
+scikit-learn
 #implicit
