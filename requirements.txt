@@ -9,5 +9,5 @@ logging
 #requests
 #streamlit
 #pandas
-scikit-learn
+#scikit-learn
 #implicit
