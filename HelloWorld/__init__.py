@@ -1,81 +1,53 @@
-import logging
-import json
-import azure.functions as func
-import pickle
-#import numpy as np
-import faiss
-import time
 import os
+import logging
+import pickle
 from azure.storage.blob import BlobServiceClient
+import azure.functions as func
+import json
 
-EMBEDDINGS = None
-NEIGHBORS = None
-INITIALIZED = False
-TOP_K = 20
+SIM_INDICES = None
+SIM_SCORES = None
 
-def load_embeddings():
-    global EMBEDDINGS
-    if EMBEDDINGS is not None:
+def load_similarities_once():
+    global SIM_INDICES, SIM_SCORES
+
+    if SIM_INDICES is not None:
         return
 
-    logging.info("Loading embeddings from Blob Storage...")
-    #conn = os.environ["ocp10_STORAGE"] //Local Execution only
-    conn = os.getenv("AzureWebJobsStorage")
-    blob_service = BlobServiceClient.from_connection_string(conn)
-    blob = blob_service.get_blob_client(
+    logging.info("Cold start: loading similarities from Blob Storage...")
+
+    connect_str = os.environ["ocp10_STORAGE"]
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+
+    blob_client = blob_service_client.get_blob_client(
         container="embeddings",
-        blob="embeddings_pca.pkl"
+        blob="top20_cosine_sim.pkl"
     )
 
-    EMBEDDINGS = pickle.loads(blob.download_blob().readall())
-    logging.info("Embeddings loaded.")
+    blob_data = blob_client.download_blob().readall()
 
-def initialize_index():
-    global INITIALIZED, NEIGHBORS
+    data = pickle.loads(blob_data)
 
-    logging.info("Cold start: initializing recommender...")
+    SIM_INDICES = data["indices"]
+    SIM_SCORES = data["scores"]
 
-    # Normalize
-    faiss.normalize_L2(EMBEDDINGS)
-
-    d = EMBEDDINGS.shape[1]
-    index = faiss.IndexFlatIP(d)
-    index.add(EMBEDDINGS)
-
-    # Compute neighbors
-    _, I = index.search(EMBEDDINGS, TOP_K + 1)
-
-    # Remove self
-    NEIGHBORS = {
-        i: I[i][1:].tolist()
-        for i in range(len(I))
-    }
-
-    INITIALIZED = True
-    logging.info("Initialization complete")
+    logging.info("Similarities loaded into memory")
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    start_time = time.time()
-    global INITIALIZED
+    load_similarities_once()
 
-    if not INITIALIZED:
-        load_embeddings()
-        initialize_index()
-        logging.info(f"Initialization time: {time.time() - start_time:.2f} seconds")
+    article_id = req.params.get("article_id")
+    if article_id is None:
+        return func.HttpResponse("Missing article_id", status_code=400)
 
-    article_id = int(req.params.get("article_id", -1))
+    article_id = int(article_id)
 
-    if article_id < 0 or article_id not in NEIGHBORS:
-        return func.HttpResponse("Invalid article_id", status_code=400)
+    recommendations = SIM_INDICES[article_id][:5].tolist()
 
-    formulating_answer_start = time.time()
-    response = func.HttpResponse(
+    return func.HttpResponse(
         json.dumps({
             "article_id": article_id,
-            "recommendations": NEIGHBORS[article_id][:5]
+            "recommendations": recommendations
         }),
         mimetype="application/json"
     )
-    logging.info(f"Answer formulation time: {time.time() - formulating_answer_start:.2f} seconds")
-    return response
-
