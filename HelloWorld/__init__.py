@@ -1,7 +1,5 @@
-import os
 import logging
 import pickle
-from azure.storage.blob import BlobServiceClient
 import azure.functions as func
 import json
 
