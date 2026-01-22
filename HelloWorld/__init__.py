@@ -1,7 +1,8 @@
 import logging
 import pickle
 import azure.functions as func
-import json
+import json 
+import numpy as np
 
 SIM_INDICES = None
 SIM_SCORES = None
