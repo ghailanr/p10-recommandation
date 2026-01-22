@@ -1,7 +1,5 @@
-import os
 import logging
 import pickle
-from azure.storage.blob import BlobServiceClient
 import azure.functions as func
 import json
 
@@ -16,17 +14,19 @@ def load_similarities_once():
 
     logging.info("Cold start: loading similarities from Blob Storage...")
 
-    connect_str = os.environ["ocp10_STORAGE"]
-    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    # connect_str = os.environ["ocp10_STORAGE"]
+    # blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
-    blob_client = blob_service_client.get_blob_client(
-        container="embeddings",
-        blob="top20_cosine_sim.pkl"
-    )
+    # blob_client = blob_service_client.get_blob_client(
+    #     container="embeddings",
+    #     blob="top20_cosine_sim.pkl"
+    # )
 
-    blob_data = blob_client.download_blob().readall()
+    # blob_data = blob_client.download_blob().readall()
 
-    data = pickle.loads(blob_data)
+    # data = pickle.loads(blob_data)
+
+    data = pickle.load(open("models/top20_cosine_sim.pkl", "rb"))
 
     SIM_INDICES = data["indices"]
     SIM_SCORES = data["scores"]
