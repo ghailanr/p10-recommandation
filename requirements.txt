@@ -1,6 +1,6 @@
 logging
 azure-functions
-numpy==2.2.6
+numpy
 # azure-storage-blob==12.19.1
 # cryptography==43.0.3
 # cffi
