@@ -15,24 +15,11 @@ def load_similarities_once():
     if SIM_INDICES is not None:
         return
 
-    logging.info("Retrieving similarities from storage")
-
-    # connect_str = os.environ["ocp10_STORAGE"]
-    # blob_service_client = BlobServiceClient.from_connection_string(connect_str)
-
-    # blob_client = blob_service_client.get_blob_client(
-    #     container="embeddings",
-    #     blob="top20_cosine_sim.pkl"
-    # )
-
-    # blob_data = blob_client.download_blob().readall()
-
-    # data = pickle.loads(blob_data)
-
     filepath = "models/top20_cosine_sim.pkl"
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"File not found: {filepath}")
     else:
+        logging.info("Retrieving similarities from storage")
         data = pd.read_pickle(filepath)
         logging.info("Similarities retrieved from storage")
         logging.info("Building matrices")
