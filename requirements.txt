@@ -3,4 +3,4 @@
 # azure-monitor-opentelemetry
 
 azure-functions
-numpy==2.2.6
+pandas
