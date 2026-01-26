@@ -1,7 +1,7 @@
 import os
 import azure.functions as func
+import numpy as np
 import logging
-import pandas as pd
 import json
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
@@ -18,14 +18,14 @@ def load_similarities_once():
     filepath = "models/top20_cosine_sim.pkl"
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"File not found: {filepath}")
-    else:
-        logging.info("Retrieving similarities from storage")
-        data = pd.read_pickle(filepath)
-        logging.info("Similarities retrieved from storage")
-        logging.info("Building matrices")
-        SIM_INDICES = data["indices"]
-        SIM_SCORES = data["scores"]
-        logging.info("Similarities loaded into memory")
+    
+    logging.info("Retrieving similarities from storage")
+    data = np.load(filepath, allow_pickle=True)
+    logging.info("Similarities retrieved from storage")
+    logging.info("Building matrices")
+    SIM_INDICES = data["indices"]
+    SIM_SCORES = data["scores"]
+    logging.info("Similarities loaded into memory")
 
 
 
