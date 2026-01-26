@@ -1,7 +1,6 @@
-logging
+# Uncomment to enable Azure Monitor OpenTelemetry
+# Ref: aka.ms/functions-azure-monitor-python
+# azure-monitor-opentelemetry
+
 azure-functions
-numpy==2.0
-cryptography==43.0.3
-# azure-storage-blob==12.19.1
-# cryptography==43.0.3
-# cffi
+numpy

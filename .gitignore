@@ -136,7 +136,7 @@ __azurite_db*__.json
 
 
 # VS Code settings
-.vscode/
+
 .history/
 *.code-workspace
 .idea/
