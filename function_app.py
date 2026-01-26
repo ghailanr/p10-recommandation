@@ -1,6 +1,6 @@
 import os
 import azure.functions as func
-# import numpy as np
+import numpy as np
 import logging
 import json
 
