@@ -14,7 +14,7 @@ def load_similarities_once():
     if SIM_INDICES is not None:
         return
 
-    logging.info("Cold start: loading similarities from Blob Storage...")
+    logging.info("Retrieving similarities from storage")
 
     # connect_str = os.environ["ocp10_STORAGE"]
     # blob_service_client = BlobServiceClient.from_connection_string(connect_str)
@@ -30,9 +30,10 @@ def load_similarities_once():
 
     data = pickle.load(open("models/top20_cosine_sim.pkl", "rb"))
 
+    logging.info("Similarities retrieved from storage")
+    logging.info("Building matrices")
     SIM_INDICES = data["indices"]
     SIM_SCORES = data["scores"]
-
     logging.info("Similarities loaded into memory")
 
 @app.route(route="recommandation")
