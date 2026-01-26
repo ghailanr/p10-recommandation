@@ -3,6 +3,7 @@ import azure.functions as func
 import logging
 import pickle
 import json
+import numpy as np
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -33,7 +34,8 @@ def load_similarities_once():
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"File not found: {filepath}")
     else:
-        data = pickle.load(open(filepath, "rb"))
+        data = np.load(open(filepath, "rb"), allow_pickle=True)
+        # data = pickle.load(open(filepath, "rb"))
         logging.info("Similarities retrieved from storage")
         logging.info("Building matrices")
         SIM_INDICES = data["indices"]
