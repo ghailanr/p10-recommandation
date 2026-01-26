@@ -3,4 +3,4 @@
 # azure-monitor-opentelemetry
 
 azure-functions
-numpy
+numpy==1.24.3
