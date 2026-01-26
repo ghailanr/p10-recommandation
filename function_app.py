@@ -1,3 +1,4 @@
+import os
 import azure.functions as func
 import logging
 import pickle
@@ -28,13 +29,18 @@ def load_similarities_once():
 
     # data = pickle.loads(blob_data)
 
-    data = pickle.load(open("models/top20_cosine_sim.pkl", "rb"))
-
-    logging.info("Similarities retrieved from storage")
-    logging.info("Building matrices")
-    SIM_INDICES = data["indices"]
-    SIM_SCORES = data["scores"]
-    logging.info("Similarities loaded into memory")
+    filepath = "models/top20_cosine_sim.pkl"
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"File not found: {filepath}")
+    else:
+        data = pickle.load(open("models/top20_cosine_sim.pkl", "rb"))
+        logging.info("Similarities retrieved from storage")
+        logging.info("Building matrices")
+        SIM_INDICES = data["indices"]
+        SIM_SCORES = data["scores"]
+        logging.info("Similarities loaded into memory")
+    
+    
 
 @app.route(route="recommandation")
 def recommandation(req: func.HttpRequest) -> func.HttpResponse:
