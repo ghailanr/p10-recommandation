@@ -33,7 +33,7 @@ def load_similarities_once():
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"File not found: {filepath}")
     else:
-        data = pickle.load(open("models/top20_cosine_sim.pkl", "rb"))
+        data = pickle.load(open(filepath, "rb"))
         logging.info("Similarities retrieved from storage")
         logging.info("Building matrices")
         SIM_INDICES = data["indices"]
