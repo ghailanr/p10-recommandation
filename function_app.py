@@ -1,10 +1,10 @@
-import os
-import azure.functions as func
-import numpy as np
-import logging
-import json
+# import os
+# import azure.functions as func
+# import numpy as np
+# import logging
+# import json
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+# app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 # SIM_INDICES = None
 # SIM_SCORES = None
