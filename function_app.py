@@ -29,29 +29,29 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 
 
-@app.route(route="recommandation")
-def recommandation(req: func.HttpRequest) -> func.HttpResponse:
-    # load_similarities_once()
+# @app.route(route="recommandation")
+# def recommandation(req: func.HttpRequest) -> func.HttpResponse:
+#     # load_similarities_once()
 
-    article_id = req.params.get('article_id')
-    if not article_id:
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            return func.HttpResponse("Missing article_id", status_code=400)
-        else:
-            article_id = req_body.get('article_id')
+#     article_id = req.params.get('article_id')
+#     if not article_id:
+#         try:
+#             req_body = req.get_json()
+#         except ValueError:
+#             return func.HttpResponse("Missing article_id", status_code=400)
+#         else:
+#             article_id = req_body.get('article_id')
 
-    article_id = int(article_id)
+#     article_id = int(article_id)
 
-    if article_id:
-        return func.HttpResponse(f"Hello, {article_id}. This HTTP triggered function executed successfully.")
+#     if article_id:
+#         return func.HttpResponse(f"Hello, {article_id}. This HTTP triggered function executed successfully.")
     
-    else:
-        return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-             status_code=200
-        )
+#     else:
+#         return func.HttpResponse(
+#              "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
+#              status_code=200
+#         )
     # recommendations = SIM_INDICES[article_id][:5].tolist()
     # return func.HttpResponse(
     #     json.dumps({
@@ -62,28 +62,28 @@ def recommandation(req: func.HttpRequest) -> func.HttpResponse:
     # )
 
 
-# import azure.functions as func
-# import logging
+import azure.functions as func
+import logging
 
-# app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-# @app.route(route="recommandation")
-# def recommandation(req: func.HttpRequest) -> func.HttpResponse:
-#     logging.info('Python HTTP trigger function processed a request.')
+@app.route(route="recommandation")
+def recommandation(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
 
-#     name = req.params.get('name')
-#     if not name:
-#         try:
-#             req_body = req.get_json()
-#         except ValueError:
-#             pass
-#         else:
-#             name = req_body.get('name')
+    name = req.params.get('name')
+    if not name:
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            pass
+        else:
+            name = req_body.get('name')
 
-#     if name:
-#         return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
-#     else:
-#         return func.HttpResponse(
-#              "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-#              status_code=200
-#         )
+    if name:
+        return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
+    else:
+        return func.HttpResponse(
+             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
+             status_code=200
+        )
