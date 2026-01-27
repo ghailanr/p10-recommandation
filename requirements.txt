@@ -2,3 +2,4 @@
 # Ref: aka.ms/functions-azure-monitor-python
 # azure-monitor-opentelemetry
 azure-functions
+numpy==2.0.2
