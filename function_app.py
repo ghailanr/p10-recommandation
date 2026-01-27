@@ -31,7 +31,7 @@ def load_similarities_once():
 
 @app.route(route="recommandation")
 def recommandation(req: func.HttpRequest) -> func.HttpResponse:
-    # load_similarities_once()
+    load_similarities_once()
 
     article_id = req.params.get('article_id')
     if not article_id:
