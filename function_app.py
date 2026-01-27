@@ -1,7 +1,7 @@
 import os
 import azure.functions as func
 import logging
-# import json
+import json
 import pickle
 import numpy as np
 
@@ -23,10 +23,10 @@ def load_similarities_once():
     logging.info("Retrieving similarities from storage")
     data = pickle.load(open(filepath, "rb"))
     logging.info("Similarities retrieved from storage")
-    # logging.info("Building matrices")
-    # SIM_INDICES = data["indices"]
-    # SIM_SCORES = data["scores"]
-    # logging.info("Similarities loaded into memory")
+    logging.info("Building matrices")
+    SIM_INDICES = data["indices"]
+    SIM_SCORES = data["scores"]
+    logging.info("Similarities loaded into memory")
 
 
 
@@ -44,23 +44,14 @@ def recommandation(req: func.HttpRequest) -> func.HttpResponse:
             article_id = req_body.get('article_id')
 
     article_id = int(article_id)
-
-    if article_id:
-        return func.HttpResponse(f"Hello, {article_id}. This HTTP triggered function executed successfully.")
-    
-    else:
-        return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-             status_code=200
-        )
-    # recommendations = SIM_INDICES[article_id][:5].tolist()
-    # return func.HttpResponse(
-    #     json.dumps({
-    #         "article_id": article_id,
-    #         "recommendations": recommendations
-    #     }),
-    #     mimetype="application/json"
-    # )
+    recommendations = SIM_INDICES[article_id][:5].tolist()
+    return func.HttpResponse(
+        json.dumps({
+            "article_id": article_id,
+            "recommendations": recommendations
+        }),
+        mimetype="application/json"
+    )
 
 
 # import azure.functions as func
@@ -83,6 +74,14 @@ def recommandation(req: func.HttpRequest) -> func.HttpResponse:
 
 #     if name:
 #         return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
+#     else:
+#         return func.HttpResponse(
+#              "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
+#              status_code=200
+#         )
+# if article_id:
+#         return func.HttpResponse(f"Hello, {article_id}. This HTTP triggered function executed successfully.")
+    
 #     else:
 #         return func.HttpResponse(
 #              "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
