@@ -1,5 +1,5 @@
 # Uncomment to enable Azure Monitor OpenTelemetry
 # Ref: aka.ms/functions-azure-monitor-python
 # azure-monitor-opentelemetry
-numpy==1.24.3
-azure-functions==1.14.0
+numpy
+azure-functions
